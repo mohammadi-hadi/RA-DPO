@@ -310,7 +310,7 @@ def write_comparison(all_metrics: list[dict]):
         "2. Re-run `scripts/analysis/predict_agreement_and_reeval.py` to "
         "refit OOF α/β/γ and recompute coverage-accuracy.",
         "3. Regenerate `tables/tab_coverage.tex` from the new numbers.",
-        "4. Update body prose in `emnlp_revised/main.tex` (lines 102, 201, 216)",
+        "4. Update body prose in the paper source",
         "   to reflect the new r / MAE / +pp numbers.",
         "",
     ]

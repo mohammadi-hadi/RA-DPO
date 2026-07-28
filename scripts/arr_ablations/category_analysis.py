@@ -1,4 +1,4 @@
-"""Sexism-category analysis of R(x)-gated abstention (ARR reviewer EfCz).
+"""Sexism-category analysis of R(x)-gated abstention (ARR reviewer request).
 
 Breaks the 692-item EXIST 2023 test split down by sexism type and shows,
 for gpt-4o {base, RA-DPO} and llama32_3b ra_dpo, what the reliability gate

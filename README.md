@@ -26,6 +26,7 @@ scripts/
   arr_ablations/        R(x) component ablation, threshold audit, matched-budget controls,
                         low-budget selection arms, EDOS second-dataset track
   local_pipeline/       hermetic 3B-backbone mirror of the hosted track (stages 01-07 + validator)
+paper_assets/           shared figure style helpers
 ```
 
 ## Setup
@@ -67,5 +68,5 @@ python scripts/arr_ablations/edos_pipeline.py --config configs/edos_pipeline.yam
 
 ## Notes
 
-- Fine-tuned OpenAI model identifiers in `scripts/evaluate_all_models.py` have their organization segment replaced with `anonymized-org`; such models are only callable from the owning API organization in any case.
+- Fine-tuned OpenAI model identifiers in `scripts/evaluate_all_models.py` have their organization segment replaced with `anonymized-org`; such models are only callable from the owning API organization in any case. Raw fine-tune job IDs (`ftjob-...`) carry no organization information and are likewise resolvable only inside the owning organization.
 - `results/` and `models/` are produced by the pipeline and are not part of this snapshot.
