@@ -27,6 +27,7 @@ scripts/
                         low-budget selection arms, EDOS second-dataset track
   local_pipeline/       hermetic 3B-backbone mirror of the hosted track (stages 01-07 + validator)
 paper_assets/           shared figure style helpers
+results/                per-instance prediction arrays (shipped); everything else is generated
 ```
 
 ## Setup
@@ -69,4 +70,4 @@ python scripts/arr_ablations/edos_pipeline.py --config configs/edos_pipeline.yam
 ## Notes
 
 - Fine-tuned OpenAI model identifiers in `scripts/evaluate_all_models.py` have their organization segment replaced with `anonymized-org`; such models are only callable from the owning API organization in any case. Raw fine-tune job IDs (`ftjob-...`) carry no organization information and are likewise resolvable only inside the owning organization.
-- `results/` and `models/` are produced by the pipeline and are not part of this snapshot.
+- `models/` and most of `results/` are produced by the pipeline. The per-instance prediction arrays behind the coverage-accuracy tables ship with the snapshot (`results/final_reliability_3factor/`, `results/local_pipeline/per_instance/`, `results/edos_pipeline/per_instance/`); they contain predictions, confidences, agreement scores, and token-uncertainty scores only, no dataset text.
