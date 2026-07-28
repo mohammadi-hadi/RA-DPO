@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+venv/
+.env
+results/
+models/
+notebooks/
+*.log
+.DS_Store
+EXIST2023_training.json
+EXIST 2023 Dataset/

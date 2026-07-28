@@ -1,0 +1,124 @@
+# Canonical configuration for the EDOS track, Llama backbone.
+#
+# Mirrors configs/local_pipeline.yaml (the EXIST local-model pipeline) on the
+# second dataset: SemEval-2023 Task 10 "Explainable Detection of Online
+# Sexism" (EDOS; Kirk et al., 2023), binary sexist / not-sexist, English only.
+# Together with configs/edos_pipeline_qwen.yaml this gives the
+# {EXIST, EDOS} x {Llama, Qwen} grid.
+#
+# This track is standalone: it must NOT modify the EXIST local pipeline, its
+# outputs, or its validator. Driver: scripts/arr_ablations/edos_pipeline.py
+# (pass --config to select a backbone).
+
+model:
+  # Same backbone as the EXIST local pipeline (configs/local_pipeline.yaml).
+  id: meta-llama/Llama-3.2-3B-Instruct
+  shortname: llama32_3b
+  dtype: fp32
+  max_seq_len: 512
+  max_new_tokens_classify: 8
+
+hardware:
+  device: mps
+  expect_unified_memory_gb: 64
+  allow_cpu_fallback: false
+
+data:
+  individual_csv: data/edos/edos_labelled_individual_annotations.csv
+  aggregated_csv: data/edos/edos_labelled_aggregated.csv
+  # Do NOT change — size assertions depend on these (official EDOS splits).
+  expected_n_items: 20000
+  expected_n_annotations: 60000
+  expected_n_train: 14000
+  expected_n_dev: 2000
+  expected_n_test: 4000
+  n_annotators: 3
+  # Ground truth is the expert-adjudicated gold label (official task), NOT
+  # the raw 3-annotator majority. majority != gold for 946/20000 items
+  # (4.73%); see src/data/edos_loader.py for the full caveat.
+  # Training pairs per variant (lines in the JSONL).
+  training_pairs:
+    sft: 14000
+    std_dpo: 14000
+    # top 30% of 14,000 by train R(x) (see rx.train_ranking below)
+    smart30_dpo: 4200
+    # Size-matched random controls. random30 is the one that isolates
+    # selection quality against Smart-30 at an identical budget; random50
+    # matches the control reported on the EXIST side.
+    random30_dpo: 4200
+    random50_dpo: 7000
+    # weight-proportional duplication: 2 copies iff agreement >= 5/6
+    # (for 3 annotators: unanimous items only; 10,850 of 14,000)
+    # 14,000 + 10,850 = 24,850 rows (1.775x) — same rule that produced
+    # EXIST's openai_ra_dpo_train.jsonl (8,984 = 5,536 + 3,448).
+    ra_dpo: 24850
+
+prompt:
+  # Only one canonical prompt for cross-model/cross-dataset comparisons.
+  # EDOS is EN-only, so only the EN template of the shared PromptBuilder is
+  # used (src/pipeline/prompts.py — same builder as the EXIST tracks).
+  strategy: structured
+  require_src_pipeline_prompts: true
+
+training:
+  # Identical to configs/local_pipeline.yaml.
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.05
+    target_modules: [q_proj, k_proj, v_proj, o_proj]
+  sft:
+    epochs: 1
+    learning_rate: 2.0e-5
+    per_device_batch_size: 2
+    grad_accum: 8
+  dpo:
+    epochs: 1
+    beta: 0.1
+    learning_rate: 5.0e-6
+    per_device_batch_size: 1
+    grad_accum: 16
+    max_prompt_length: 384
+    max_length: 512
+
+rx:
+  # Inference-time R(x) = alpha * conf + beta * agree + gamma * (1 - sigmoid)
+  # with 5-fold OOF weight fitting — identical to the EXIST pipelines.
+  coverage_levels: [1.00, 0.90, 0.80, 0.60, 0.50]
+  n_folds: 5
+  seed: 42
+  # Train-side ranking used to build the Smart-30% subset. Replicates the
+  # EXIST train ranking, empirically recovered from the shipped artifacts:
+  #   R_train(x) = 0.8 * agreement + 0.2 * (1 - sigmoid_score)
+  # Evidence: reproduces smart30_dpo.jsonl membership 1661/1661 and
+  # smart50_dpo.jsonl membership 2768/2768 exactly, and matches
+  # results/smart_sampling/jobs.json rx_stats within 1.5e-3. No model
+  # confidence term is involved on the train side.
+  train_ranking:
+    agreement_weight: 0.8
+    uncertainty_weight: 0.2
+  # Random-subset controls built by build-rx-subsets (fraction of the train
+  # split, drawn with rx.seed).
+  random_fractions: [0.30, 0.50]
+  # EDOS sigmoid_scores come from the token-scoring plug-in
+  # (scripts/arr_ablations/edos_token_scores.py), NOT from the EXIST cache
+  # (those are properties of EXIST tweets). One cache file per backend
+  # (token_scores_<backend>.json) so runs cannot silently mix methods;
+  # token_scores_backend selects the canonical cache the pipeline consumes.
+  # Backends: openai (exact EXIST method port; blocked on API quota),
+  # local_masking (word-masking with Llama YES/NO probs; ~20 h for 18k on
+  # M4 Max -> over budget), local_single_pass (1 forward/item approximation
+  # with the same sigmoid aggregation formula; RECOMMENDED, ~1 h for 18k).
+  token_scores_dir: results/edos_pipeline/token_scores
+  token_scores_backend: local_single_pass
+
+evaluation:
+  bootstrap_n: 2000
+  compute_mcnemar: true
+
+# Variants run by this track (in run order).
+variants: [base, sft, std_dpo, smart30_dpo, random30_dpo, random50_dpo, ra_dpo]
+
+output_dirs:
+  results_root: results/edos_pipeline
+  models_root: models/edos_pipeline

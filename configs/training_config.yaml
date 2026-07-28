@@ -1,0 +1,162 @@
+# Training Configuration for Sexism Detection with DPO
+
+# Model Settings
+model:
+  base_model: "meta-llama/Meta-Llama-3-8B-Instruct"
+  # Smaller model for Apple Silicon (fits in unified memory without quantization)
+  small_model: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+  alternative_models:
+    - "mistralai/Mistral-7B-Instruct-v0.2"
+    - "microsoft/phi-2"
+  baseline_model: "bert-base-multilingual-cased"
+
+# Data Settings
+data:
+  train_file: "EXIST2023_training.json"
+  test_file: "EXIST 2023 Dataset/test/EXIST2023_test_clean.json"
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  languages:
+    - "en"
+    - "es"
+
+# Baseline (mBERT) Training
+baseline:
+  learning_rate: 3.0e-5
+  batch_size: 32
+  epochs: 5
+  max_seq_length: 256
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  early_stopping_patience: 3
+
+# Supervised Fine-Tuning (SFT)
+sft:
+  # QLoRA settings
+  lora_r: 8
+  lora_alpha: 32
+  lora_dropout: 0.1
+  target_modules:
+    - "q_proj"
+    - "v_proj"
+    - "k_proj"
+    - "o_proj"
+  # Training settings
+  num_epochs: 5
+  batch_size: 4
+  gradient_accumulation_steps: 8
+  learning_rate: 2.0e-4
+  warmup_ratio: 0.03
+  max_seq_length: 512
+  # Quantization (auto-disabled on MPS/CPU)
+  use_4bit: true
+  bnb_4bit_compute_dtype: "bfloat16"
+  bnb_4bit_quant_type: "nf4"
+
+# Standard DPO Training
+dpo:
+  beta: 0.1
+  loss_type: "sigmoid"  # sigmoid, hinge, ipo
+  # QLoRA settings (can override SFT)
+  lora_r: 8
+  lora_alpha: 16
+  lora_dropout: 0.1
+  # Training settings
+  max_steps: 2000
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 5.0e-5
+  warmup_steps: 100
+  max_length: 512
+  max_prompt_length: 256
+
+# Confidence-Weighted DPO
+confidence_dpo:
+  confidence_alpha: 1.0  # Weight for model confidence
+  agreement_alpha: 1.0   # Weight for annotator agreement
+  correct_weight_scaling: 1.0
+  wrong_weight_scaling: 1.5
+
+# XAI-Enhanced DPO
+xai_dpo:
+  use_xai_prompts: true
+  highlight_marker: "**"
+  top_k_tokens: 50
+  xai_weight_boost: 1.2
+  # SHAP settings
+  shap_background_samples: 100
+  shap_max_evals: 500
+
+# Zero-Shot Settings
+zero_shot:
+  max_new_tokens: 5
+  temperature: 0.0
+  do_sample: false
+
+# Few-Shot Settings
+few_shot:
+  num_examples: 5
+  examples_per_class: 3
+  selection_strategy: "high_agreement"  # random, high_agreement, diverse
+
+# Evaluation
+evaluation:
+  metrics:
+    - "f1_macro"
+    - "accuracy"
+    - "precision_macro"
+    - "recall_macro"
+  primary_metric: "f1_macro"
+
+# Output Directories
+output:
+  base_dir: "./models"
+  baseline_dir: "./models/baseline"
+  sft_dir: "./models/sft"
+  dpo_dir: "./models/dpo"
+  confidence_dpo_dir: "./models/confidence_dpo"
+  xai_dpo_dir: "./models/xai_dpo"
+  results_dir: "./results"
+
+# Experiment Tracking
+tracking:
+  use_wandb: false
+  project_name: "sexism-detection-dpo"
+  entity: null
+
+# Hardware
+hardware:
+  device: "auto"  # auto-detect CUDA/MPS/CPU
+  seed: 42
+  fp16: true      # Use fp16 for MPS compatibility
+  bf16: false     # Disabled for MPS (bf16 not well supported)
+  gradient_checkpointing: true
+
+# Logging
+logging:
+  logging_steps: 50
+  save_steps: 500
+  eval_steps: 500
+  save_total_limit: 2
+
+# Reliability Inference Pipeline
+reliability_inference:
+  # Calibration
+  calibration_method: "temperature"  # temperature, platt
+  initial_temperature: 1.5
+  # Reliability scoring weights
+  confidence_weight: 0.5     # alpha
+  agreement_weight: 0.3      # beta
+  token_weight: 0.2          # gamma
+  # Decision threshold
+  predict_threshold: 0.6
+  # Token analysis
+  importance_weight_min: 0.7
+  importance_weight_max: 1.3
+  # Threshold sweep
+  threshold_sweep_start: 0.5
+  threshold_sweep_end: 0.95
+  threshold_sweep_steps: 19
+  # Output
+  output_dir: "./results/reliability"

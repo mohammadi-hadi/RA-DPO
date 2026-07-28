@@ -1,0 +1,118 @@
+# Local pipeline, Qwen backbone. Identical to local_pipeline.yaml
+# except the model block. Select with:
+#   LOCAL_PIPELINE_CONFIG=configs/local_pipeline_qwen.yaml <stage script>
+# Canonical configuration for the local-model pipeline.
+# Any change here bumps results/local_pipeline/config_hash.txt and retriggers
+# validation. See LOCAL_PIPELINE_RULES.md.
+
+model:
+  # Pivoted from 7B → 3B: 7B DPO on MPS fp16 hits NaN around step 50 regardless
+  # of gradient clipping (log-prob softmax overflow in fp16). 3B fits in fp32
+  # comfortably on M4 Max 64 GB, which is numerically stable AND still fast.
+  # 7B config kept in git history if CUDA / MLX DPO pipelines become available.
+  id: Qwen/Qwen2.5-3B-Instruct
+  shortname: qwen25_3b
+  dtype: fp32
+  max_seq_len: 512
+  max_new_tokens_classify: 8
+
+hardware:
+  device: mps
+  expect_unified_memory_gb: 64
+  allow_cpu_fallback: false
+
+data:
+  training_json: EXIST2023_training.json
+  # Do NOT change — tested size assertions depend on these.
+  expected_n_train: 5536
+  expected_n_val: 692
+  expected_n_test: 692
+  # Training pairs per DPO variant (lines in the JSONL).
+  training_pairs:
+    sft: 5536
+    smart10_dpo: 554
+    smart30_dpo: 1661
+    smart50_dpo: 2768
+    random50_dpo: 2768
+    # Size-matched random control for smart30_dpo. random50 controls for
+    # smart50; without this arm there is no way to separate "the ranking
+    # picks better pairs" from "1,661 pairs is enough".
+    random30_dpo: 1661
+    # Low-budget selection arms (554 pairs each) isolating whether the
+    # agreement filter and the uncertainty ranking carry signal.
+    flip10_dpo: 554
+    randunan10_dpo: 554
+    random10_dpo: 554
+    strat10_dpo: 554
+    noworst10_dpo: 554
+    # Single-annotator label-noise arms: same items as random10/strat10 but
+    # each pair labelled by one randomly drawn annotator (~17-18% flipped).
+    # smart10 is protocol-invariant (100% unanimous) and needs no counterpart.
+    noisy1_random10_dpo: 554
+    noisy1_strat10_dpo: 554
+    # Student-need arms: agreement gate (>=5/6) x base-model-wrong ranking.
+    # Per-backbone b/c the base model's errors differ per student.
+    hard10_llama_dpo: 554
+    hardctl10_llama_dpo: 554
+    hardall10_llama_dpo: 554
+    hard10_qwen_dpo: 554
+    hardctl10_qwen_dpo: 554
+    hardall10_qwen_dpo: 554
+    standard_dpo: 5536
+    ambiguous_dpo: 665
+    ra_dpo: 8984
+    # Component-ablation variants (top-30% by a single R(x) component).
+    agree30_dpo: 1661
+    agree30_tb2_dpo: 1661
+    uncert30_dpo: 1661
+    conf30_dpo: 1661
+    # Reweighted SFT baselines (train on the full SFT file with per-example
+    # agreement weights / soft labels).
+    wsft: 5536
+    softlabel_sft: 5536
+
+prompt:
+  # Only one canonical prompt for cross-model comparisons.
+  strategy: structured
+  # Enforce that we use the shared prompt builder, not inlined strings.
+  require_src_pipeline_prompts: true
+
+training:
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.05
+    target_modules: [q_proj, k_proj, v_proj, o_proj]
+  sft:
+    epochs: 1
+    learning_rate: 2.0e-5
+    per_device_batch_size: 2
+    grad_accum: 8
+  dpo:
+    epochs: 1
+    beta: 0.1
+    learning_rate: 5.0e-6
+    per_device_batch_size: 1
+    grad_accum: 16
+    max_prompt_length: 384
+    max_length: 512
+
+rx:
+  # R(x) = alpha * conf + beta * agree + gamma * (1 - sigmoid)
+  coverage_levels: [1.00, 0.90, 0.80, 0.60, 0.50]
+  n_folds: 5
+  seed: 42
+  # Use the gpt-4o pipeline's token-scoring sigmoid_scores, which are a
+  # property of the tweet (computed once with gpt-4o-mini word-importance).
+  reuse_sigmoid_scores_from_gpt4o: true
+  # Agreement handling at inference. "oracle" uses the true dataset label;
+  # "deployable" uses the mBERT regressor prediction; "no_agreement" drops beta.
+  inference_agreement_settings: [oracle, deployable, no_agreement]
+
+evaluation:
+  bootstrap_n: 2000
+  compute_mcnemar: true
+
+output_dirs:
+  results_root: results/local_pipeline
+  models_root: models/local_pipeline

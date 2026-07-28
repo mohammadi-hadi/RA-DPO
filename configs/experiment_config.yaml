@@ -1,0 +1,93 @@
+# =============================================================================
+# Experiment Configuration — Systematic Sexism Detection Evaluation
+# =============================================================================
+
+experiment:
+  name: "sexism_detection_comprehensive"
+  description: "Systematic evaluation across models, prompts, and training strategies"
+  seed: 42
+
+# ── Data ─────────────────────────────────────────────────────────────────────
+data:
+  train_file: "EXIST2023_training.json"
+  test_file: "EXIST 2023 Dataset/test/EXIST2023_test_clean.json"
+  languages: ["en", "es"]
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+
+# ── OpenAI Models ────────────────────────────────────────────────────────────
+openai:
+  models:
+    - gpt-4.1-nano        # Cheapest / fastest
+    - gpt-4.1-mini        # Good cost-quality balance
+    - gpt-4.1             # Latest flagship
+    - gpt-4o-mini         # Previous gen mini
+    - gpt-4o              # Previous gen flagship
+    - o3-mini             # Reasoning (no logprobs)
+    - o4-mini             # Latest reasoning
+  batch_api: true          # Use Batch API for runs > 100 samples
+  rate_limit_rpm: 500
+
+# ── Local HuggingFace Models (M4 Max 64 GB) ─────────────────────────────────
+local_models:
+  TinyLlama-1.1B:
+    hf_id: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+    quantize: false
+    train: false
+  Phi-3-mini-3.8B:
+    hf_id: "microsoft/Phi-3-mini-4k-instruct"
+    quantize: false
+    train: false
+  Mistral-7B:
+    hf_id: "mistralai/Mistral-7B-Instruct-v0.3"
+    quantize: false
+    train: true            # SFT → DPO → Conf-DPO → XAI-DPO
+  Llama-3.1-8B:
+    hf_id: "meta-llama/Llama-3.1-8B-Instruct"
+    quantize: false
+    train: true
+  Qwen2.5-7B:
+    hf_id: "Qwen/Qwen2.5-7B-Instruct"
+    quantize: false
+    train: false
+  Gemma-2-9B:
+    hf_id: "google/gemma-2-9b-it"
+    quantize: false
+    train: false           # Inference only (too large for SFT on MPS)
+
+# ── Prompt Strategies ────────────────────────────────────────────────────────
+prompt_strategies:
+  - basic                  # Simple task description (baseline)
+  - definition             # Full sexism taxonomy
+  - cot                    # Chain-of-thought
+  - persona                # Expert annotator role-playing
+  - structured             # Checklist-based criteria
+
+# ── Scenarios ────────────────────────────────────────────────────────────────
+scenarios:
+  - zero_shot
+  - few_shot
+
+training_scenarios:
+  - sft
+  - dpo
+  - confidence_dpo
+  - xai_dpo
+
+# ── Efficiency Experiment ────────────────────────────────────────────────────
+efficiency:
+  fractions: [0.10, 0.25, 0.50, 0.75, 1.00]
+  sampling_strategies: ["random", "smart"]
+  models: ["Mistral-7B", "Llama-3.1-8B"]
+
+# ── Few-Shot ─────────────────────────────────────────────────────────────────
+few_shot:
+  num_examples: 5
+  examples_per_class: 3
+  selection_strategy: "high_agreement"
+
+# ── Output ───────────────────────────────────────────────────────────────────
+output:
+  base_dir: "./results/experiments"
+  resume: true

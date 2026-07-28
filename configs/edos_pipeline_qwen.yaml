@@ -1,0 +1,90 @@
+# EDOS track, second backbone (Qwen2.5-3B-Instruct).
+#
+# Identical to configs/edos_pipeline.yaml in every respect except the model
+# block and models_root. Together the two configs give the
+# {EXIST, EDOS} x {Llama, Qwen} grid.
+#
+# results_root is shared with the Llama config on purpose: per-instance files
+# and the unified/ output are both keyed by model.shortname, so the two
+# backbones cannot overwrite each other, and the training pairs in pairs/ are
+# backbone-independent (sigmoid_scores are a property of the text under one
+# scoring pass, shared across backbones exactly as the EXIST local pipeline
+# shares one score set via reuse_sigmoid_scores_from_gpt4o).
+#
+# Run with:  edos_pipeline.py --config configs/edos_pipeline_qwen.yaml <cmd>
+
+model:
+  id: Qwen/Qwen2.5-3B-Instruct
+  shortname: qwen25_3b
+  dtype: fp32
+  max_seq_len: 512
+  max_new_tokens_classify: 8
+
+hardware:
+  device: mps
+  expect_unified_memory_gb: 64
+  allow_cpu_fallback: false
+
+data:
+  individual_csv: data/edos/edos_labelled_individual_annotations.csv
+  aggregated_csv: data/edos/edos_labelled_aggregated.csv
+  # Do NOT change — size assertions depend on these (official EDOS splits).
+  expected_n_items: 20000
+  expected_n_annotations: 60000
+  expected_n_train: 14000
+  expected_n_dev: 2000
+  expected_n_test: 4000
+  n_annotators: 3
+  training_pairs:
+    sft: 14000
+    std_dpo: 14000
+    smart30_dpo: 4200
+    random30_dpo: 4200
+    random50_dpo: 7000
+    ra_dpo: 24850
+
+prompt:
+  strategy: structured
+  require_src_pipeline_prompts: true
+
+training:
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.05
+    target_modules: [q_proj, k_proj, v_proj, o_proj]
+  sft:
+    epochs: 1
+    learning_rate: 2.0e-5
+    per_device_batch_size: 2
+    grad_accum: 8
+  dpo:
+    epochs: 1
+    beta: 0.1
+    learning_rate: 5.0e-6
+    per_device_batch_size: 1
+    grad_accum: 16
+    max_prompt_length: 384
+    max_length: 512
+
+rx:
+  coverage_levels: [1.00, 0.90, 0.80, 0.60, 0.50]
+  n_folds: 5
+  seed: 42
+  train_ranking:
+    agreement_weight: 0.8
+    uncertainty_weight: 0.2
+  random_fractions: [0.30, 0.50]
+  token_scores_dir: results/edos_pipeline/token_scores
+  token_scores_backend: local_single_pass
+
+evaluation:
+  bootstrap_n: 2000
+  compute_mcnemar: true
+
+variants: [base, sft, std_dpo, smart30_dpo, random30_dpo, random50_dpo, ra_dpo]
+
+output_dirs:
+  results_root: results/edos_pipeline
+  # Separate from the Llama adapters (adapter_dir is not keyed by shortname).
+  models_root: models/edos_pipeline_qwen
