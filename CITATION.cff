@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below. The accompanying paper is under review; its citation will be added upon publication."
+title: "RA-DPO: Reliability-Aware Preference Optimization and Selective Prediction for Sexism Detection"
+type: software
+authors:
+  - family-names: Mohammadi
+    given-names: Hadi
+repository-code: "https://github.com/mohammadi-hadi/RA-DPO"
+url: "https://github.com/mohammadi-hadi/RA-DPO"
+license: MIT
+version: 0.1.0
+date-released: 2026-08-05

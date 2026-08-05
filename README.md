@@ -6,6 +6,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/mohammadi-hadi/RA-DPO/actions/workflows/ci.yml/badge.svg)](https://github.com/mohammadi-hadi/RA-DPO/actions/workflows/ci.yml)
 [![Datasets: EXIST 2023 · EDOS](https://img.shields.io/badge/Datasets-EXIST%202023%20%C2%B7%20EDOS-8A2BE2.svg)](#data)
 [![Backbones: gpt-4o · Llama-3.2-3B · Qwen2.5-3B](https://img.shields.io/badge/Backbones-gpt--4o%20%C2%B7%20Llama--3.2--3B%20%C2%B7%20Qwen2.5--3B-0A7E8C.svg)](#results)
 [![Languages: EN · ES](https://img.shields.io/badge/Languages-EN%20%C2%B7%20ES-success.svg)](#results)
@@ -102,21 +103,62 @@ Selective prediction with `R(x)` on gpt-4o RA-DPO, accuracy at 50% coverage:
   text-based regressor (Twitter-XLM-R, Pearson r = 0.351) still exceeds both the
   confidence-only baseline and the no-agreement floor.
 
-## Quick Start
+## Installation
+
+Install the package straight from GitHub:
 
 ```bash
-git clone <this repository>
+pip install "ra-dpo @ git+https://github.com/mohammadi-hadi/RA-DPO.git"
+```
+
+The base install stays light (the numpy/pandas/scikit-learn stack). Extras pull in what
+each track needs: `openai` (hosted gpt-4o track), `local` (torch/transformers/peft/trl
+for the 3B track), `explain` (token scoring + SHAP), `tracking` (wandb), `cuda`
+(bitsandbytes), or `all`:
+
+```bash
+pip install "ra-dpo[all] @ git+https://github.com/mohammadi-hadi/RA-DPO.git"
+```
+
+## Use as a Library
+
+```python
+from ra_dpo.utils.reliability_scoring import ReliabilityScorer, ReliabilityScoringConfig
+
+scorer = ReliabilityScorer(ReliabilityScoringConfig(
+    confidence_weight=0.5,   # alpha
+    agreement_weight=0.3,    # beta
+    token_weight=0.2,        # gamma
+    predict_threshold=0.6,   # tau
+))
+score, decision = scorer.score_instance(
+    calibrated_confidence=0.91, agreement_score=0.67, critical_fraction=0.20,
+)
+# score = 0.816, decision = "PREDICT"
+```
+
+`WeightOptimizer` learns the weights by out-of-fold logistic regression instead of
+hand-setting them, and `compute_abstention_metrics` produces the coverage-accuracy
+numbers in the Results section.
+
+## Quick Start
+
+The run scripts, configs, and shipped result arrays live in the repository, so
+reproduction starts from a clone:
+
+```bash
+git clone https://github.com/mohammadi-hadi/RA-DPO.git
 cd RA-DPO
 
 python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
+pip install -e ".[all]"          # or: pip install -r requirements.txt (pinned research env)
 export OPENAI_API_KEY='sk-...'   # only needed for the hosted-model track
 ```
 
 Full pipeline (all stages, all models):
 
 ```bash
-python scripts/run_pipeline.py                      # everything
+python scripts/run_pipeline.py                      # everything (equivalent: ra-dpo)
 python scripts/run_pipeline.py --stages openai local
 python scripts/run_pipeline.py --stages training efficiency
 python scripts/run_pipeline.py --max-samples 50     # small-sample debug run
@@ -154,11 +196,12 @@ a training filter.
 
 ```
 RA-DPO/
+├── pyproject.toml           package metadata — pip install, extras, the ra-dpo command
 ├── configs/                 hyperparameters: training, experiment matrix, local + EDOS pipelines
 ├── docs/                    LOCAL_PIPELINE_RULES.md — invariants the validator enforces
-├── src/
+├── ra_dpo/                  the installable package
+│   ├── cli.py               the ra-dpo console entry point
 │   ├── data/                EXIST/EDOS loaders, preference-pair generation
-│   ├── models/              baseline, zero/few-shot, SFT, DPO variants, agreement predictor
 │   ├── pipeline/            6-stage experiment pipeline (openai, local, training, efficiency,
 │   │                        reliability, report)
 │   ├── explainability/      continuous token scoring (sigmoid token weights)
@@ -171,7 +214,7 @@ RA-DPO/
 │   └── local_pipeline/      hermetic 3B mirror of the hosted track (stages 01-07 + validator)
 ├── paper_assets/            shared figure-style helpers
 ├── results/                 per-instance prediction arrays (shipped); everything else generated
-└── requirements.txt
+└── requirements.txt         pinned research environment (superset of the package deps)
 ```
 
 <a name="data"></a>
@@ -192,7 +235,9 @@ tables are reproducible without the raw data.
 <a name="citation"></a>
 ## Citation
 
-The accompanying paper is under review; citation information will be added upon publication.
+The accompanying paper is under review; its citation will be added upon publication. Until
+then, cite the software via [CITATION.cff](CITATION.cff) (the "Cite this repository"
+button on GitHub).
 
 ## License
 
