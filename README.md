@@ -7,6 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/mohammadi-hadi/RA-DPO/actions/workflows/ci.yml/badge.svg)](https://github.com/mohammadi-hadi/RA-DPO/actions/workflows/ci.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21802837.svg)](https://doi.org/10.5281/zenodo.21802837)
 [![Datasets: EXIST 2023 · EDOS](https://img.shields.io/badge/Datasets-EXIST%202023%20%C2%B7%20EDOS-8A2BE2.svg)](#data)
 [![Backbones: gpt-4o · Llama-3.2-3B · Qwen2.5-3B](https://img.shields.io/badge/Backbones-gpt--4o%20%C2%B7%20Llama--3.2--3B%20%C2%B7%20Qwen2.5--3B-0A7E8C.svg)](#results)
 [![Languages: EN · ES](https://img.shields.io/badge/Languages-EN%20%C2%B7%20ES-success.svg)](#results)
@@ -237,7 +238,8 @@ tables are reproducible without the raw data.
 
 The accompanying paper is under review; its citation will be added upon publication. Until
 then, cite the software via [CITATION.cff](CITATION.cff) (the "Cite this repository"
-button on GitHub).
+button on GitHub). Every release is archived on Zenodo under DOI
+[10.5281/zenodo.21802837](https://doi.org/10.5281/zenodo.21802837).
 
 ## License
 
