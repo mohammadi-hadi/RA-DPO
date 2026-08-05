@@ -34,8 +34,8 @@ import torch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
-from src.models.agreement_predictor import AgreementPredictor
+from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
+from ra_dpo.models.agreement_predictor import AgreementPredictor
 
 
 # Registered models. shortname -> (hf_id, default_batch_size, default_lr)

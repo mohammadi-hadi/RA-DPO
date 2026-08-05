@@ -49,7 +49,7 @@ class LocalModelRunner:
         self.unload_model()
 
         from transformers import AutoModelForCausalLM, AutoTokenizer
-        from src.models.sft_trainer import _detect_device, _get_torch_dtype
+        from ra_dpo.models.sft_trainer import _detect_device, _get_torch_dtype
 
         device = _detect_device()
         dtype = _get_torch_dtype(device)
@@ -135,7 +135,7 @@ class LocalModelRunner:
             confidences.append(conf)
 
         true_labels = test_subset["majority_label"].tolist()
-        from src.utils.metrics import compute_metrics
+        from ra_dpo.utils.metrics import compute_metrics
         metrics = compute_metrics(true_labels, predictions)
         metrics["avg_confidence"] = float(np.mean(confidences)) if confidences else 0.0
 
@@ -222,7 +222,7 @@ class LocalModelRunner:
     def _select_few_shot_examples(
         self, train_df: pd.DataFrame, lang: str
     ) -> List[Dict[str, str]]:
-        from src.data.data_loader import agreement_score
+        from ra_dpo.data.data_loader import agreement_score
 
         lang_df = train_df[train_df["lang"] == lang].copy()
         lang_df["_agree"] = lang_df["labels_task1"].apply(agreement_score)

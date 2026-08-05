@@ -45,8 +45,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from src.pipeline.prompts import PromptBuilder
-from src.utils.metrics import compute_metrics
+from ra_dpo.pipeline.prompts import PromptBuilder
+from ra_dpo.utils.metrics import compute_metrics
 
 VARIANTS = ("conf30", "uncert30", "agree30")
 BASE_MODEL = "gpt-4o-2024-08-06"

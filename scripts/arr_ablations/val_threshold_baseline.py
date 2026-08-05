@@ -27,8 +27,8 @@ sys.path.insert(0, str(ROOT))
 
 from scripts.local_pipeline import load_config  # noqa: E402
 from scripts.local_pipeline.stage_02_baseline_inference import yes_no_token_ids  # noqa: E402
-from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score  # noqa: E402
-from src.pipeline.prompts import PromptBuilder  # noqa: E402
+from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score  # noqa: E402
+from ra_dpo.pipeline.prompts import PromptBuilder  # noqa: E402
 
 OUT = ROOT / "results" / "local_pipeline" / "train_pool_base"
 

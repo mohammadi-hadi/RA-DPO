@@ -27,8 +27,8 @@ from sklearn.preprocessing import StandardScaler
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
-from src.models.agreement_predictor import AgreementPredictor
+from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
+from ra_dpo.models.agreement_predictor import AgreementPredictor
 
 IN_DIR = ROOT / "results" / "final_reliability_3factor"
 OUT_DIR = ROOT / "results" / "unified_gpt4o" / "predicted_agreement"

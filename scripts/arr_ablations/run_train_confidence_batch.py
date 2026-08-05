@@ -3,7 +3,7 @@
 The paper's smart-sampling R(x) over the TRAIN split used per-post model
 confidences that were never persisted. This script rebuilds them with the
 exact request construction the paper used for test-set inference
-(src/pipeline/openai_runner.py::_run_batch_api — structured prompt per
+(ra_dpo/pipeline/openai_runner.py::_run_batch_api — structured prompt per
 language, temperature 0.0, max_tokens 10, logprobs=True, top_logprobs=5)
 and the p_yes/(p_yes+p_no) normalization (confidence = max of the two).
 
@@ -48,8 +48,8 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
-from src.pipeline.prompts import PromptBuilder, STRATEGY_MAX_TOKENS
+from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
+from ra_dpo.pipeline.prompts import PromptBuilder, STRATEGY_MAX_TOKENS
 
 MODEL = "gpt-4o"
 STRATEGY = "structured"

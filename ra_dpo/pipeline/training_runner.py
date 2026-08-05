@@ -2,7 +2,7 @@
 Training runner for SFT and DPO variants.
 
 Orchestrates: SFT → DPO → Confidence-DPO → XAI-DPO for trainable models.
-Reuses existing src/models/ trainers.
+Reuses the existing model trainers.
 """
 
 from datetime import datetime
@@ -50,7 +50,7 @@ class TrainingRunner:
         if not self.config.resume or not self.results_mgr.exists(sft_key):
             if not _checkpoint_exists(sft_dir):
                 print(f"  [SFT] Training {model_key}...")
-                from src.models.sft_trainer import train_sft
+                from ra_dpo.models.sft_trainer import train_sft
                 sft_result = train_sft(
                     train_df=train_df, val_df=val_df,
                     model_name=hf_id, output_dir=sft_dir,
@@ -70,7 +70,7 @@ class TrainingRunner:
         if not self.config.resume or not self.results_mgr.exists(dpo_key):
             if not _checkpoint_exists(dpo_dir):
                 print(f"  [DPO] Training {model_key}...")
-                from src.models.dpo_trainer import train_dpo
+                from ra_dpo.models.dpo_trainer import train_dpo
                 sft_path = sft_dir if _checkpoint_exists(sft_dir) else None
                 dpo_result = train_dpo(
                     train_df=train_df, val_df=val_df,
@@ -92,7 +92,7 @@ class TrainingRunner:
         if not self.config.resume or not self.results_mgr.exists(conf_key):
             if not _checkpoint_exists(conf_dir):
                 print(f"  [Conf-DPO] Training {model_key}...")
-                from src.models.confidence_dpo import train_confidence_dpo
+                from ra_dpo.models.confidence_dpo import train_confidence_dpo
                 sft_path = sft_dir if _checkpoint_exists(sft_dir) else None
                 conf_result = train_confidence_dpo(
                     train_df=train_df, val_df=val_df,
@@ -114,7 +114,7 @@ class TrainingRunner:
         if not self.config.resume or not self.results_mgr.exists(xai_key):
             if not _checkpoint_exists(xai_dir):
                 print(f"  [XAI-DPO] Training {model_key}...")
-                from src.models.xai_dpo import train_xai_dpo
+                from ra_dpo.models.xai_dpo import train_xai_dpo
                 sft_path = sft_dir if _checkpoint_exists(sft_dir) else None
                 xai_result = train_xai_dpo(
                     train_df=train_df, val_df=val_df,

@@ -75,7 +75,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from src.data.edos_loader import EDOSDataLoader  # noqa: E402
+from ra_dpo.data.edos_loader import EDOSDataLoader  # noqa: E402
 
 CONFIG_PATH = ROOT / "configs" / "edos_pipeline.yaml"
 STEEPNESS = 10  # k parameter — same as scripts/compute_token_scores.py
@@ -388,7 +388,7 @@ def get_token_score_local_single_pass(model, tok, pb, strategy, text,
 
 def run_local(df, cache, tag, device, batch_size, approx, save_every=100):
     from tqdm import tqdm
-    from src.pipeline.prompts import PromptBuilder
+    from ra_dpo.pipeline.prompts import PromptBuilder
     cfg = load_config()
     strategy = cfg["prompt"]["strategy"]
     tok, model = load_local_model(device)

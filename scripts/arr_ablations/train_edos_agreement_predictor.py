@@ -29,8 +29,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from src.data.edos_loader import EDOSDataLoader  # noqa: E402
-from src.models.agreement_predictor import AgreementPredictor  # noqa: E402
+from ra_dpo.data.edos_loader import EDOSDataLoader  # noqa: E402
+from ra_dpo.models.agreement_predictor import AgreementPredictor  # noqa: E402
 
 OUT_DIR = ROOT / "results" / "edos_pipeline" / "predicted_agreement"
 

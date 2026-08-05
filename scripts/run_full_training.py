@@ -26,8 +26,8 @@ import torch
 import pandas as pd
 from tqdm import tqdm
 
-from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
-from src.utils.metrics import compute_metrics
+from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
+from ra_dpo.utils.metrics import compute_metrics
 
 
 MODELS = {
@@ -70,7 +70,7 @@ def evaluate_trained_model(model_name, model_path, test_df, sft_path=None):
     """Load a trained model and evaluate on test data."""
     from transformers import AutoModelForCausalLM, AutoTokenizer
     from peft import PeftModel
-    from src.models.sft_trainer import _detect_device, _get_torch_dtype
+    from ra_dpo.models.sft_trainer import _detect_device, _get_torch_dtype
 
     device = _detect_device()
     dtype = _get_torch_dtype(device)
@@ -151,7 +151,7 @@ def run_pipeline_for_model(model_key, hf_id, train_df, val_df, test_df, max_step
     print(f"{'='*60}")
 
     if not checkpoint_exists(sft_dir):
-        from src.models.sft_trainer import train_sft
+        from ra_dpo.models.sft_trainer import train_sft
         t0 = time.time()
         train_sft(
             train_df=train_df, val_df=val_df,
@@ -187,7 +187,7 @@ def run_pipeline_for_model(model_key, hf_id, train_df, val_df, test_df, max_step
     print(f"{'='*60}")
 
     if not checkpoint_exists(dpo_dir):
-        from src.models.dpo_trainer import train_dpo
+        from ra_dpo.models.dpo_trainer import train_dpo
         t0 = time.time()
         train_dpo(
             train_df=train_df, val_df=val_df,
@@ -224,7 +224,7 @@ def run_pipeline_for_model(model_key, hf_id, train_df, val_df, test_df, max_step
     print(f"{'='*60}")
 
     if not checkpoint_exists(conf_dir):
-        from src.models.confidence_dpo import train_confidence_dpo
+        from ra_dpo.models.confidence_dpo import train_confidence_dpo
         t0 = time.time()
         train_confidence_dpo(
             train_df=train_df, val_df=val_df,

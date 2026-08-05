@@ -59,7 +59,7 @@ VARIANTS = ["wsft", "softlabel_sft"]
 
 def load_train_metadata(cfg) -> dict:
     """tweet text -> {agreement, yes_frac, majority} from the seed-42 train split."""
-    from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
+    from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
 
     loader = EXISTDataLoader(str(ROOT / cfg["data"]["training_json"]))
     df = loader.to_dataframe()

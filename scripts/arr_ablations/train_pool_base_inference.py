@@ -30,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from scripts.local_pipeline import load_config, config_hash  # noqa: E402
 from scripts.local_pipeline.stage_02_baseline_inference import yes_no_token_ids  # noqa: E402
-from src.pipeline.prompts import PromptBuilder  # noqa: E402
+from ra_dpo.pipeline.prompts import PromptBuilder  # noqa: E402
 from build_component_ablation_subsets import load_train_df  # noqa: E402
 
 OUT_DIR = ROOT / "results" / "local_pipeline" / "train_pool_base"

@@ -43,7 +43,7 @@ from sklearn.preprocessing import StandardScaler
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from src.data.data_loader import agreement_score  # noqa: E402
+from ra_dpo.data.data_loader import agreement_score  # noqa: E402
 
 TEST_ORDER = ROOT / "results" / "agreement_predictor_comparison" / "twitter-xlmr-base" / "test_order.json"
 RAW_JSON = ROOT / "EXIST2023_training.json"

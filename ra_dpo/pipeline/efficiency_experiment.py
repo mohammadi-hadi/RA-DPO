@@ -54,7 +54,7 @@ class EfficiencyExperiment:
                 # SFT on subset (shared between DPO variants)
                 sft_dir = str(base_dir / "sft")
                 if not _checkpoint_exists(sft_dir):
-                    from src.models.sft_trainer import train_sft
+                    from ra_dpo.models.sft_trainer import train_sft
                     train_sft(
                         train_df=subset_df, val_df=val_df,
                         model_name=hf_id, output_dir=sft_dir,
@@ -93,7 +93,7 @@ class EfficiencyExperiment:
             return train_df.sample(n=min(n, len(train_df)), random_state=self.config.seed)
 
         elif sampling == "smart":
-            from src.data.data_loader import agreement_score
+            from ra_dpo.data.data_loader import agreement_score
 
             df = train_df.copy()
             if "agreement_score" not in df.columns:
@@ -134,14 +134,14 @@ class EfficiencyExperiment:
 
         if not _checkpoint_exists(output_dir):
             if method == "dpo":
-                from src.models.dpo_trainer import train_dpo
+                from ra_dpo.models.dpo_trainer import train_dpo
                 train_dpo(
                     train_df=train_df, val_df=val_df,
                     sft_model_path=sft_path,
                     model_name=hf_id, output_dir=output_dir,
                 )
             elif method == "confidence_dpo":
-                from src.models.confidence_dpo import train_confidence_dpo
+                from ra_dpo.models.confidence_dpo import train_confidence_dpo
                 train_confidence_dpo(
                     train_df=train_df, val_df=val_df,
                     sft_model_path=sft_path,

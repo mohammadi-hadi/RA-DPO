@@ -21,7 +21,7 @@ PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
+from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
 from tqdm import tqdm
 
 if not os.environ.get('OPENAI_API_KEY'):

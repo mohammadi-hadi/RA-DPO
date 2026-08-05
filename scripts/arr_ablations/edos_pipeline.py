@@ -82,7 +82,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from src.data.edos_loader import EDOSDataLoader  # noqa: E402
+from ra_dpo.data.edos_loader import EDOSDataLoader  # noqa: E402
 import edos_token_scores as ets  # noqa: E402  (plug-in: sigmoid_scores)
 
 CONFIG_PATH = ROOT / "configs" / "edos_pipeline.yaml"
@@ -481,8 +481,8 @@ def cmd_train(args):
 def cmd_infer(args):
     import torch
     from tqdm import tqdm
-    from src.pipeline.prompts import PromptBuilder
-    from src.utils.metrics import compute_metrics
+    from ra_dpo.pipeline.prompts import PromptBuilder
+    from ra_dpo.utils.metrics import compute_metrics
 
     cfg = load_config()
     variant, split = args.variant, args.split

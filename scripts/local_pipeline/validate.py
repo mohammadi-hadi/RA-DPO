@@ -136,7 +136,7 @@ def check_config(r: Report) -> None:
 
 def check_data_split(r: Report) -> None:
     try:
-        from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
+        from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
         loader = EXISTDataLoader(str(ROOT / load_config()["data"]["training_json"]))
         df = loader.to_dataframe()
         df["majority_label"] = df["labels_task1"].apply(majority_vote)

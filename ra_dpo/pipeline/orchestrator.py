@@ -70,7 +70,7 @@ class PipelineOrchestrator:
     # ------------------------------------------------------------------
 
     def _load_data(self):
-        from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
+        from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
 
         print("\n[DATA] Loading EXIST 2023 dataset...")
         loader = EXISTDataLoader(self.config.data_path)
@@ -253,7 +253,7 @@ class PipelineOrchestrator:
         else:
             print("  Training agreement predictor...")
             try:
-                from src.models.agreement_predictor import train_agreement_predictor
+                from ra_dpo.models.agreement_predictor import train_agreement_predictor
                 result = train_agreement_predictor(
                     train_df=self.train_df, val_df=self.val_df, test_df=self.test_df,
                     output_dir=str(self.config.output_dir + "/models/agreement_predictor"),
@@ -270,7 +270,7 @@ class PipelineOrchestrator:
             print("  Optimizing reliability weights...")
             try:
                 import numpy as np
-                from src.utils.weight_optimizer import optimize_reliability_weights
+                from ra_dpo.utils.weight_optimizer import optimize_reliability_weights
 
                 # Use validation data for weight optimization
                 val_conf = np.random.uniform(0.5, 1.0, len(self.val_df))  # Placeholder

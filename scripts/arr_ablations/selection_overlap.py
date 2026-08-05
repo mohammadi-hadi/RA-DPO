@@ -42,7 +42,7 @@ from scipy.stats import spearmanr
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from src.data.data_loader import EXISTDataLoader, agreement_score
+from ra_dpo.data.data_loader import EXISTDataLoader, agreement_score
 
 SMART30_PATH = ROOT / "results" / "smart_sampling" / "smart30_dpo.jsonl"
 TOKEN_SCORES_PATH = ROOT / "results" / "token_scores" / "token_scores_cache.json"

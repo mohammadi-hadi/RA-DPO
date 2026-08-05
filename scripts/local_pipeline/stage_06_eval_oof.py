@@ -30,9 +30,9 @@ from scripts.local_pipeline import (
     load_config, config_hash, per_instance_path, per_instance_dir,
     training_dir, save_per_instance, write_checkpoint, shortname,
 )
-from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
-from src.pipeline.prompts import PromptBuilder
-from src.utils.metrics import compute_metrics
+from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
+from ra_dpo.pipeline.prompts import PromptBuilder
+from ra_dpo.utils.metrics import compute_metrics
 
 REF_PATH = ROOT / "results" / "final_reliability_3factor" / "gpt-4o_base.json"
 COV_LEVELS = [1.00, 0.90, 0.80, 0.60, 0.50]

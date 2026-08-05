@@ -109,7 +109,7 @@ class OpenAIRunner:
             )
 
         true_labels = test_subset["majority_label"].tolist()
-        from src.utils.metrics import compute_metrics
+        from ra_dpo.utils.metrics import compute_metrics
         metrics = compute_metrics(true_labels, predictions)
         metrics["avg_confidence"] = float(np.mean(confidences)) if confidences else 0.0
 
@@ -339,7 +339,7 @@ class OpenAIRunner:
         self, train_df: pd.DataFrame, lang: str
     ) -> List[Dict[str, str]]:
         """Select few-shot examples using high-agreement strategy."""
-        from src.data.data_loader import agreement_score
+        from ra_dpo.data.data_loader import agreement_score
 
         lang_df = train_df[train_df["lang"] == lang].copy()
         lang_df["_agree"] = lang_df["labels_task1"].apply(agreement_score)

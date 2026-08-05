@@ -28,9 +28,9 @@ PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
-from src.utils.metrics import compute_metrics
-from src.pipeline.prompts import PromptBuilder
+from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
+from ra_dpo.utils.metrics import compute_metrics
+from ra_dpo.pipeline.prompts import PromptBuilder
 
 
 # Reliability weights (optimized via logistic regression)

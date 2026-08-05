@@ -81,8 +81,8 @@ def parse_args() -> argparse.Namespace:
 def main():
     args = parse_args()
 
-    from src.pipeline.config import ExperimentConfig
-    from src.pipeline.orchestrator import PipelineOrchestrator
+    from ra_dpo.pipeline.config import ExperimentConfig
+    from ra_dpo.pipeline.orchestrator import PipelineOrchestrator
 
     config = ExperimentConfig.from_yaml(args.config, overrides=args)
     orchestrator = PipelineOrchestrator(config)

@@ -184,7 +184,7 @@ SUBSET_COMPOSITION = [
 # Values are the actual `per_instance.correct` rate from
 # results/final_reliability_3factor/gpt-4o_*.json computed on the canonical
 # 692-sample test split (random_state=42 stratified split, see
-# src/data/data_loader.py). One base model (gpt-4o), no gpt-4o-mini entries.
+# ra_dpo/data/data_loader.py). One base model (gpt-4o), no gpt-4o-mini entries.
 HARD_EASY = [
     # model, easy acc (>=0.83), hard acc (<0.67)
     ("OpenAI base",          0.819, 0.613),

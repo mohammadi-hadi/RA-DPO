@@ -125,10 +125,10 @@ Stage `N` MUST NOT run until stage `N-1`'s invariants pass.
 
 ## 6 · Prompt / label rules (non-negotiable)
 
-- The structured prompt for inference comes from `src/pipeline/prompts.py → get_system_prompt("structured", lang)`. Do not inline it into local scripts.
+- The structured prompt for inference comes from `ra_dpo/pipeline/prompts.py → get_system_prompt("structured", lang)`. Do not inline it into local scripts.
 - For SFT, training data is `results/openai_sft_train.jsonl` (5,535 lines, unchanged).
 - For DPO, training data is `results/smart_sampling/*.jsonl` (same files used by the gpt-4o track).
-- Majority vote uses `src.data.data_loader.majority_vote`. Ties (3/3) are broken by whichever label lexicographically comes first — **this is a property of the shared data loader** and must match the gpt-4o track.
+- Majority vote uses `ra_dpo.data.data_loader.majority_vote`. Ties (3/3) are broken by whichever label lexicographically comes first — **this is a property of the shared data loader** and must match the gpt-4o track.
 
 ---
 

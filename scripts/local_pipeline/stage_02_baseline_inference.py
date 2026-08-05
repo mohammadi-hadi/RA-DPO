@@ -24,9 +24,9 @@ sys.path.insert(0, str(ROOT))
 from scripts.local_pipeline import (
     load_config, config_hash, save_per_instance, write_checkpoint,
 )
-from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
-from src.pipeline.prompts import PromptBuilder
-from src.utils.metrics import compute_metrics
+from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
+from ra_dpo.pipeline.prompts import PromptBuilder
+from ra_dpo.utils.metrics import compute_metrics
 
 REF_PATH = ROOT / "results" / "final_reliability_3factor" / "gpt-4o_base.json"
 

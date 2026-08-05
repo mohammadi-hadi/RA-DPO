@@ -36,7 +36,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from src.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
+from ra_dpo.data.data_loader import EXISTDataLoader, majority_vote, agreement_score
 
 OUT_DIR = ROOT / "results" / "smart_sampling"
 TOKEN_SCORES = ROOT / "results" / "token_scores" / "token_scores_cache.json"
